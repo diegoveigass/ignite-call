@@ -6,6 +6,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/router'
+import { api } from '@/lib/axios'
+import error from 'next/error'
+import { AxiosError } from 'axios'
 
 const registerFormSchema = z.object({
   username: z
@@ -43,7 +46,19 @@ export default function Register() {
   }, [router.query?.username, setValue])
 
   async function handleRegister(data: RegisterFormData) {
-    console.log(data)
+    try {
+      await api.post('/users', {
+        name: data.name,
+        username: data.username,
+      })
+    } catch (error) {
+      if (error instanceof AxiosError && error?.response?.data?.message) {
+        alert(error.response.data.message)
+        return
+      }
+
+      console.error(error)
+    }
   }
 
   return (
