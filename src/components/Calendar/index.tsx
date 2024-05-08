@@ -8,19 +8,62 @@ import {
   CalendarTitle,
 } from './styles'
 import { getWeekDays } from '@/utils/get-week-days'
+import { useMemo, useState } from 'react'
+import dayjs from 'dayjs'
 
 export function Calendar() {
+  const [currentDate, setCurrentDate] = useState(() => {
+    return dayjs().set('date', 1)
+  })
+
+  function handlePreviousMonth() {
+    const previousMonthDate = currentDate.subtract(1, 'month')
+
+    setCurrentDate(previousMonthDate)
+  }
+
+  function handleNextMonth() {
+    const nextMonthDate = currentDate.add(1, 'month')
+
+    setCurrentDate(nextMonthDate)
+  }
+
   const shortWeekDays = getWeekDays({ short: true })
+
+  const currentMonth = currentDate.format('MMMM')
+  const currentYear = currentDate.format('YYYY')
+
+  const calendarWeeks = useMemo(() => {
+    const daysInMonthArray = Array.from({
+      length: currentDate.daysInMonth(),
+    }).map((_, index) => {
+      return currentDate.set('date', index + 1)
+    })
+
+    const firstWeekDay = currentDate.get('day') // day = dia da semana . date = o dia atual
+
+    const previousMonthFillArray = Array.from({ length: firstWeekDay })
+      .map((_, i) => {
+        return currentDate.subtract(i + 1, 'day')
+      })
+      .reverse()
+
+    return [...previousMonthFillArray, ...daysInMonthArray]
+  }, [currentDate])
+
+  console.log(calendarWeeks)
 
   return (
     <CalendarContainer>
       <CalendarHeader>
-        <CalendarTitle>Março 2024</CalendarTitle>
+        <CalendarTitle>
+          {currentMonth} <span>{currentYear}</span>
+        </CalendarTitle>
         <CalendarActions>
-          <button>
+          <button onClick={handlePreviousMonth} title="Previous month">
             <CaretLeft />
           </button>
-          <button>
+          <button onClick={handleNextMonth} title="Next month">
             <CaretRight />
           </button>
         </CalendarActions>
