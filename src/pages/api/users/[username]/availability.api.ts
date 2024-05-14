@@ -3,6 +3,8 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+dayjs.extend(utc)
+
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse,
